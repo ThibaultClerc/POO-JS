@@ -1,6 +1,6 @@
 class Monk extends Character {
-  constructor(name, hp = 8, dmg = 2, mana = 200, status = "playing", specialOffensive = false, specialManaMin = 25) {
-    super(name, hp, dmg, mana, status, specialOffensive, specialManaMin)
+  constructor(name, hp = 8, dmg = 2, mana = 200, status = "playing", specialOffensive = false, specialManaMin = 25, shield, hasPlayed = false) {
+    super(name, hp, dmg, mana, status, specialOffensive, specialManaMin, shield, hasPlayed)
   }
 
   special = () => {

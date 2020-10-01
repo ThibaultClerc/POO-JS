@@ -80,6 +80,7 @@ class Game {
       playersLeft.filter(player => {
         if (player.name == victim) {
             attacker.dealDamage(player);
+            player.takeDamage(attacker.dmg, this.status[this.status.length - 1]);
         }
       });
     } else if (choice === "B" && attacker.specialOffensive === true && attacker.mana >= attacker.specialManaMin) {
@@ -87,7 +88,8 @@ class Game {
       let playersLeft = this.players.filter(player => ((player.name !== attacker.name) && (player.status !== "loser")));
       playersLeft.filter(player => {
         if (player.name == victim) {
-            attacker.special(player);
+            attacker.special(player, this.status[this.status.length - 1]);
+            player.takeDamage(attacker.dmg, this.status[this.status.length - 1]);
           }
         });
     } else if (choice === "B" && attacker.specialOffensive === false && attacker.mana >= attacker.specialManaMin) {
@@ -107,7 +109,22 @@ class Game {
     .map(player => player.name)
     console.log(`La partie est terminée ! Winner(s) : ${winners.join("  ")} !`);
   }
+
+  powersTurn = () => {
+    this.players.forEach(player => {
+      if ((player.shield === true) && (player.specialActivator !== this.status[this.status.length - 1])){
+        player.shield = false
+      }
+    });
+  }
+
+  havePlayed = () => {
+    this.players.forEach(player => player.hasPlayed = false)
+    return this.players
+  }
 }
+
+  
 
 // ---- GAME ----
 
@@ -121,21 +138,23 @@ let wizard = new Wizard("Gandalf")
 let game = new Game
 game.players.push(fighter, paladin, monk, berzerker, assassin, wizard)
 
-while (game.players.filter(player => player.status === "loser").length < 4) {
+while (game.players.filter(player => player.status === "loser").length < (game.players.length - 1)) {
   if (game.currentTurn === 10) {
     break
   } else {
     game.startTurn();
-    console.log(game.status)
+    game.watchStats()
     let actualAttacker;
-    while (game.turnPlayers.length < game.players.filter(player => player.status !== "loser").length) {
+    while (game.turnPlayers.length < (game.players.filter(player => player.status !== "loser").length)) {
       actualAttacker = game.playerAboutToAttack()
       game.whoToAttack(actualAttacker, game.whatYouWannaDo(actualAttacker))
       game.deadPlayer(actualAttacker)
+      actualAttacker.hasPlayed = true
     }
-    game.watchStats()
+    game.powersTurn()
     game.turnPlayers = []
     game.skipTurn()
+    game.havePlayed()
   }
 }
 

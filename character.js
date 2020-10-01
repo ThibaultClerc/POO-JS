@@ -1,28 +1,42 @@
 class Character {
-  constructor(name, hp, dmg, mana, status = "playing", specialOffensive, specialManaMin) {
+  constructor(name, hp, dmg, mana, status = "playing", specialOffensive, specialManaMin, specialActivator, shield, shieldValue, hasPlayed = false) {
     this.name = name
     this.hp = hp,
     this.dmg = dmg,
     this.mana = mana,
     this.status = status,
     this.specialOffensive = specialOffensive,
-    this.specialManaMin = specialManaMin
+    this.specialManaMin = specialManaMin,
+    this.specialActivator = specialActivator,
+    this.shield = shield,
+    this.shieldValue = shieldValue,
+    this.hasPlayed = hasPlayed
   }
 
-  takeDamage = (damages) => {
-    this.hp -= damages;
-    if (this.hp < 1) {
-      console.log(`${this.name} have been killed`);
-      this.status = "loser";
+  takeDamage = (damages, activator) => {
+    if ((typeof this.shield !== 'undefined') && (this.shield === true) && (this.constructor.name !== 'Assassin')) {
+      let finalDamages = (damages - (this.shieldValue))
+      this.hp -= finalDamages
+      if (this.hp >= 1) {
+        console.log(`He deals him ${finalDamages} damages. ${this.name} got ${this.hp} lifepoints left`)
+      }
+    } else if ((this.shield === true) && (this.constructor.name === 'Assassin') && (this.specialActivator !== activator)) {
+      let finalDamages = 0
+      console.log(this.hp, "Points de vie de l'assassin quand il se fait attaquer avec son pouvoir activé")
+      if (this.hp >= 1) {
+        console.log(`${this.name} a activé Shadow Hit et ne prend donc pas de dégats`)
+      }
+    } else {
+      let finalDamages = damages;
+      this.hp -= finalDamages
+      if (this.hp >= 1) {
+        console.log(`He deals him ${finalDamages} damages. ${this.name} got ${this.hp} lifepoints left`)
+      }
     }
   }
 
   dealDamage = (victim) => {
-    victim.hp -= this.dmg;
-    if (victim.hp < 1) {
-      victim.hp = 0
-    }
-    console.log(`${this.name} is attacking ${victim.name}. He deals him ${this.dmg} damages. ${victim.name} got ${victim.hp} lifepoints left`)
+    console.log(`${this.name} is attacking ${victim.name}.`)
   }
 
   stats = () => {
